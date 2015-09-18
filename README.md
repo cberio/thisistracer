@@ -13,3 +13,9 @@
 3. [Azure Blob Storage 사용 예제](http://www.codeproject.com/Articles/490178/How-to-Use-Azure-Blob-Storage-with-Azure-Web-Sites)
 4. [Customize GoogleMap InfoWindow](http://en.marnoto.com/2014/09/5-formas-de-personalizar-infowindow.html)
 5. [Image 파일의 EXIF 값으로 이미지 회전](http://stackoverflow.com/questions/6222053/problem-reading-jpeg-metadata-orientation)
+
+## ToDo List
+1. Upload Form
+2. Social Login
+3. User 별 container 생성 후 Upload
+4. 30일 이상 미활동 container/User Data 삭제
