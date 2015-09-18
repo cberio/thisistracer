@@ -38,7 +38,7 @@
         </a>
     </div>
 
-    <div id="map" class="col-md-6" style="height:700px;margin-top:15px;margin-bottom:15px">
+    <div id="map" class="col-md-12">
     </div>
 
     <div class="hidden">
@@ -66,6 +66,12 @@
     *@
 </div>
 <style>
+    #map {
+        height:100%;
+        width:100%;
+        margin-top:15px;
+        margin-bottom:15px;
+    }
     .gm-style-iw {
         /*width: 214px !important;*/
         top: 15px !important;
@@ -109,7 +115,7 @@
 
     .iw-content img {
         float: right;
-        margin: 0 5px 5px 10px;
+        margin: 0 0px 5px 10px;
         width: 100%;
     }
 </style>
@@ -118,27 +124,31 @@
     var map, geoList, infoWindow, infoContent, marker;
     var markerList = [];
     var markerObj = { lat: [], lng: [], idx: [], date: [], url: [] };
-    var isMobile = "@ViewBag.IsMobile";
-
+    
     $(document).ready(function () {
         $(".item:first").addClass("active");
         $(".carousel-indicators li:first").addClass("active");
+        $("#map").css("height", window.innerHeight);
         deviceWidth = screen.width;
         ratio = window.DeviceRotationRate || 1;
     });
 
     $(".carousel").on('slid.bs.carousel', function (data) {
         map.setZoom(11);
+        activeMarker();
+    });
+
+    $(window).load(function () {
+        //activeMarker();
+        //$(".carousel").carousel('cycle');
+    });
+
+    function activeMarker() {
         var activeIdx = $(".carousel-inner .active").index();
 
         map.panTo({ lat: markerObj.lat[activeIdx], lng: markerObj.lng[activeIdx] });
         google.maps.event.trigger(markerList[activeIdx], "click");
-
-    });
-
-    $(window).load(function () {
-        //$(".carousel").carousel('pause');
-    });
+    }
 
 
     function initMap() {
@@ -190,9 +200,8 @@
 
             markerList.push(marker);
         }
-
         infoWindowStyle();
-
+        activeMarker();
         /*
         geoList = $.getJSON('/BlobStorages/getGeoInfo', function (json) {
             $.each(json, function (idx, data) {
