@@ -13,6 +13,7 @@
 3. [Azure Blob Storage 사용 예제](http://www.codeproject.com/Articles/490178/How-to-Use-Azure-Blob-Storage-with-Azure-Web-Sites)
 4. [Customize GoogleMap InfoWindow](http://en.marnoto.com/2014/09/5-formas-de-personalizar-infowindow.html)
 5. [Image 파일의 EXIF 값으로 이미지 회전](http://stackoverflow.com/questions/6222053/problem-reading-jpeg-metadata-orientation)
+6. [Azure에 배보 시 민감한 정보 제외하기](http://www.hanselman.com/blog/HowToKeepYourASPNETDatabaseConnectionStringsSecureWhenDeployingToAzureFromSource.aspx)
 
 ## ToDo
 1. Upload Form
