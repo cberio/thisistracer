@@ -1,0 +1,276 @@
+﻿@model IEnumerable<thisistracer.Models.PhotoMapModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div id="carousel-example-generic" class="carousel slide col-md-6 hidden" data-ride="carousel" style="margin-top:15px;margin-bottom:15px">
+        <!-- Indicators -->
+        <ol class="carousel-indicators hidden">
+            @foreach (var item in Model)
+            {
+                <li data-target="#carousel-example-generic" data-slide-to="@item.idx" class=""></li>
+            }
+        </ol>
+
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner" role="listbox">
+            @foreach (var item in Model)
+            {
+                <div class="item" style="">
+                    <img src="" alt="..." style="margin:auto auto auto auto; height:auto;width:auto">
+                    <div class="carousel-caption hidden-xs hidden">
+                        ...
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Controls -->
+        <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+
+    <div id="map" class="col-md-6" style="height:700px;margin-top:15px;margin-bottom:15px">
+    </div>
+
+    <div class="hidden">
+        @foreach (var item in Model)
+        {
+            @Html.Hidden("idx", item.idx)        <br />
+            @Html.Hidden("lat", item.F_Latitude) <br />
+            @Html.Hidden("lng", item.F_Longitude)<br />
+            @Html.Hidden("date", item.PicDate)   <br />
+            @Html.Hidden("url", item.F_Url)      <br />
+        }
+    </div>
+
+    @*
+        <div id="infoContent" class="hidden">
+            <div id="iw-container">
+                <div class="iw-title"></div>
+                <div class="iw-content">
+                    <div class="iw-subTitle"></div>
+                    <img src="" alt="" height="115" width="83">
+                </div>
+                <div class="iw-bottom-gradient"></div>
+            </div>
+        </div>
+    *@
+</div>
+<style>
+    .gm-style-iw {
+        /*width: 214px !important;*/
+        top: 15px !important;
+        left: 0px !important;
+        background-color: #fff;
+        box-shadow: 0 1px 6px rgba(178, 178, 178, 0.6);
+        border: 1px solid rgba(72, 181, 233, 0.6);
+        border-radius: 2px 2px 0 0;
+        padding: 5px 0 0 6px;
+    }
+
+        .gm-style-iw:first-child {
+            max-height: none;
+        }
+
+    #iw-container {
+        /*margin-bottom: 10px;*/
+    }
+
+        #iw-container .iw-title {
+            font-family: 'Open Sans Condensed', sans-serif;
+            font-size: 22px;
+            font-weight: 400;
+            padding: 10px;
+            background-color: #48b5e9;
+            color: white;
+            margin: 0;
+            border-radius: 2px 2px 0 0;
+        }
+
+        #iw-container .iw-content {
+            font-size: 13px;
+            line-height: 18px;
+            font-weight: 400;
+            margin-right: 1px;
+            /*padding: 15px 5px 20px 15px;*/
+            /*max-height: 140px;*/
+            /*overflow-y: auto;*/
+            overflow-x: hidden;
+        }
+
+    .iw-content img {
+        float: right;
+        margin: 0 5px 5px 10px;
+        width: 100%;
+    }
+</style>
+<script type="text/javascript">
+    var deviceWidth, ratio;
+    var map, geoList, infoWindow, infoContent, marker;
+    var markerList = [];
+    var markerObj = { lat: [], lng: [], idx: [], date: [], url: [] };
+    var isMobile = "@ViewBag.IsMobile";
+
+    $(document).ready(function () {
+        $(".item:first").addClass("active");
+        $(".carousel-indicators li:first").addClass("active");
+        deviceWidth = screen.width;
+        ratio = window.DeviceRotationRate || 1;
+    });
+
+    $(".carousel").on('slid.bs.carousel', function (data) {
+        map.setZoom(11);
+        var activeIdx = $(".carousel-inner .active").index();
+
+        map.panTo({ lat: markerObj.lat[activeIdx], lng: markerObj.lng[activeIdx] });
+        google.maps.event.trigger(markerList[activeIdx], "click");
+
+    });
+    $(window).load(function () {
+        $(".carousel").carousel('pause');
+    });
+
+
+    function initMap() {
+        infoWindow = new google.maps.InfoWindow();
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: { lat: Number($("input[name='lat']").val()), lng: Number($("input[name='lng']").val()) },
+            zoom: 11
+        });
+
+        $("input[type='hidden']").each(function (idx, ele) {
+            switch ($(ele).attr("name")) {
+                case "idx":
+                    markerObj.idx.push(idx);
+                    break;
+                case "lat":
+                    markerObj.lat.push(Number($(this).val()));
+                    break;
+                case "lng":
+                    markerObj.lng.push(Number($(this).val()));
+                    break;
+                case "date":
+                    markerObj.date.push($(this).val());
+                    break;
+                case "url":
+                    markerObj.url.push($(this).val());
+                    break;
+            }
+        });
+
+        for (var i = 0; i < markerObj.idx.length; i++) {
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(markerObj.lat[i], markerObj.lng[i]),
+                map: map
+            });
+
+            google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                return function () {
+
+                    map.setZoom(11);
+                    map.panTo(marker.getPosition());
+                    infoWindow.setContent(intowindowContent(markerObj.date[i], markerObj.url[i], '100%', '100%'));
+                    //infoWindow.setContent($("#infoContent").html());
+                    infoWindow.open(map, marker);
+
+                    //console.log(infoWindow.getPosition(), marker.getPosition());
+                }
+            })(marker, i));
+
+            markerList.push(marker);
+        }
+
+        infoWindowStyle();
+
+        /*
+        geoList = $.getJSON('/BlobStorages/getGeoInfo', function (json) {
+            $.each(json, function (idx, data) {
+                markerObj.lat.push(data.F_Latitude);
+                markerObj.lng.push(data.F_Longitude);
+                markerObj.idx.push(idx);
+            });
+        });
+
+        geoList.done(function (doneData) {
+
+
+        });
+        */
+    }
+
+    function intowindowContent(title, url, height, width) {
+        if (height == "") height = 115;
+        if (width == "") width = 83;
+
+        var content = '<div id="iw-container">' +
+                        '<div class="iw-title">' + title + '</div>' +
+                        '<div class="iw-content">' +
+                            '<img src="' + url + '" alt="">' +
+                        '</div>' +
+                      '</div>';
+        return content;
+    }
+
+    /*
+     * The google.maps.event.addListener() event waits for
+     * the creation of the infowindow HTML structure 'domready'
+     * and before the opening of the infowindow defined styles
+     * are applied.
+    */
+    function infoWindowStyle() {
+
+        google.maps.event.addListener(infoWindow, 'domready', function () {
+
+            // Reference to the DIV which receives the contents of the infowindow using jQuery
+            var iwOuter = $('.gm-style-iw');
+            /* The DIV we want to change is above the .gm-style-iw DIV.
+             * So, we use jQuery and create a iwBackground variable,
+             * and took advantage of the existing reference to .gm-style-iw for the previous DIV with .prev().
+             */
+            var iwBackground = iwOuter.prev();
+
+            // Remove the background shadow DIV
+            iwBackground.children(':nth-child(2)').css({ 'display': 'none' });
+
+            // Remove the white background DIV
+            iwBackground.children(':nth-child(4)').css({ 'display': 'none' });
+
+            // Moves the infowindow 115px to the right.
+            //iwOuter.parent().parent().css({ left: '115px' });
+
+            //iwOuter.children('div').attr('style', 'display: inline-block; overflow: auto; max-height: 558px; max-width:'+$(".gm-style-iw").css("width")+';');
+
+            // Moves the shadow of the arrow 76px to the left margin
+            //iwBackground.children(':nth-child(1)').attr('style', function (i, s) { return s + 'left: 76px !important;' });
+
+            // Moves the arrow 76px to the left margin
+            //iwBackground.children(':nth-child(3)').attr('style', function (i, s) { return s + 'left: 76px !important;' });
+
+            // Changes the desired color for the tail outline.
+            // The outline of the tail is composed of two descendants of div which contains the tail.
+            // The .find('div').children() method refers to all the div which are direct descendants of the previous div.
+            //iwBackground.children(':nth-child(3)').find('div').children().css({ 'box-shadow': 'rgba(72, 181, 233, 0.6) 0px 1px 6px', 'z-index': '1' });
+
+            // Reference to the div that groups the close button elements.
+            //var iwCloseBtn = iwOuter.next();
+
+            // Apply the desired effect to the close button
+            //iwCloseBtn.css({ opacity: '1', right: '38px', top: '3px', border: '7px solid #48b5e9', 'border-radius': '13px', 'box-shadow': '0 0 5px #3990B9' });
+
+        });
+    }
+
+
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCLISk5-d5kFnu69ywMXdeDS0jsshtgpCU&callback=initMap">
+</script>
