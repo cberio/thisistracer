@@ -232,7 +232,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-<Target Name="AfterBuild">
-    <TransformXml Condition=" '$(Environment)' != '' " Source="Web.config" Transform="Web.$(Environment).config" Destination="Web.config" />
-</Target>
 </Project>
