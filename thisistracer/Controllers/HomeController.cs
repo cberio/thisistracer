@@ -10,11 +10,11 @@ namespace thisistracer.Controllers
 {
     public class HomeController : Controller
     {
-        private IPhotoMapRepository iPhotoMap;
+        IPhotoMapRepository iPhotoMap;
 
-        public HomeController()
+        public HomeController(IPhotoMapRepository repo)
         {
-            this.iPhotoMap = new PhotoMapRepository();
+            iPhotoMap = repo;
         }
 
         // GET: Home

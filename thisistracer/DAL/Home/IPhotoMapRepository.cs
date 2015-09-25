@@ -10,7 +10,7 @@ using thisistracer.Models;
 
 namespace thisistracer.DAL.Home
 {
-    interface IPhotoMapRepository : IDisposable
+    public interface IPhotoMapRepository : IDisposable
     {
         IEnumerable<PhotoMapModel> GetMapInfoList();
 
@@ -23,7 +23,7 @@ namespace thisistracer.DAL.Home
         byte[] GetPropertyItemValue(Image img, int propId);
 
         Task<Image> LoadPicture(Uri url);
-
+        
         CloudBlobContainer GetContainer(string containerName);
         CloudBlobContainer GetContainer();
 

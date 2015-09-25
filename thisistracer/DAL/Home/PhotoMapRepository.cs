@@ -24,11 +24,26 @@ namespace thisistracer.DAL.Home
 
         public PhotoMapRepository()
         {
-            storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["AzureStroageConnection"]);
-            blobClient = storageAccount.CreateCloudBlobClient();
-            container = blobClient.GetContainerReference("photo");
-            container.SetPermissions(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Container });
-            container.CreateIfNotExists();
+            try
+            {
+                storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["AzureStroageConnection"]);
+                blobClient = storageAccount.CreateCloudBlobClient();
+                container = blobClient.GetContainerReference("photo");
+
+                if (container.CreateIfNotExists())
+                {
+                    container.SetPermissions(
+                        new BlobContainerPermissions
+                        {
+                            PublicAccess = BlobContainerPublicAccessType.Container
+                        }
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Azure Connection Problem");
+            }
         }
 
         public IEnumerable<PhotoMapModel> GetMapInfoList()
@@ -46,14 +61,14 @@ namespace thisistracer.DAL.Home
                     CloudBlockBlob blob = (CloudBlockBlob)item;
                     PhotoMapModel bStorage = new PhotoMapModel();
 
-                    bStorage.idx         = idx;
+                    bStorage.idx = idx;
                     bStorage.ContentType = blob.Properties.ContentType;
-                    bStorage.F_Size      = blob.Properties.Length;
-                    bStorage.F_Name      = blob.Name;
-                    bStorage.F_OrgName   = blob.Metadata["OrgName"];
-                    bStorage.F_Url       = blob.Uri;
-                    bStorage.PicDate     = DateTime.TryParse(blob.Metadata["Date"], out dt) ? DateTime.Parse(blob.Metadata["Date"]) : dt;
-                    bStorage.F_Latitude  = float.TryParse(blob.Metadata["lat"], out lat) ? (float?)float.Parse(blob.Metadata["lat"]) : GetLatitude(bStorage.F_Url);
+                    bStorage.F_Size = blob.Properties.Length;
+                    bStorage.F_Name = blob.Name;
+                    bStorage.F_OrgName = blob.Metadata["OrgName"];
+                    bStorage.F_Url = blob.Uri;
+                    bStorage.PicDate = DateTime.TryParse(blob.Metadata["Date"], out dt) ? DateTime.Parse(blob.Metadata["Date"]) : dt;
+                    bStorage.F_Latitude = float.TryParse(blob.Metadata["lat"], out lat) ? (float?)float.Parse(blob.Metadata["lat"]) : GetLatitude(bStorage.F_Url);
                     bStorage.F_Longitude = float.TryParse(blob.Metadata["lng"], out lng) ? (float?)float.Parse(blob.Metadata["lng"]) : GetLongitude(bStorage.F_Url);
                     idx++;
                     L_bStroage.Add(bStorage);
@@ -226,57 +241,58 @@ namespace thisistracer.DAL.Home
 
         public void UploadToBlobStorage(System.Web.HttpPostedFileBase fs)
         {
+            if (fs == null || fs.ContentLength == 0)
+                return;
+
+            if (fs.ContentType != "image/jpeg")
+                return;
+
             string uniqueName = string.Format("collection01/image_{0}{1}",
                 DateTime.Now.ToString("yyyyMMddhhmmssms"), Path.GetExtension(fs.FileName));
 
+
+            Image bmp = Image.FromStream(fs.InputStream);
             MemoryStream ms = new MemoryStream();
-            ms.Position = 0;
-            Image bmp = null;
+            ms.Position = 0;            
 
             CloudBlockBlob blob = container.GetBlockBlobReference(uniqueName);
-            blob.Properties.ContentType = fs.ContentType;
+            blob.Properties.ContentType = fs.ContentType;            
 
-            if (fs.ContentType == "image/jpeg")
+            var lat = GetLatitude(bmp);
+            var lng = GetLongitude(bmp);
+            var date = GetPropertyItemValue(bmp, 36867) ?? null; // pic date
+
+            blob.Metadata["OrgName"] = fs.FileName;
+            if (lat != null && lng != null)
             {
-                bmp = Image.FromStream(fs.InputStream);
-
-                var lat = GetLatitude(bmp);
-                var lng = GetLongitude(bmp);
-                var date = GetPropertyItemValue(bmp, 36867) ?? null; // pic date
-
-                blob.Metadata["OrgName"] = fs.FileName;
-                if (lat != null && lng != null)
-                {
-                    blob.Metadata["lat"] = lat.ToString();
-                    blob.Metadata["lng"] = lng.ToString();
-                }
-                if (date != null)
-                {
-                    Regex r = new Regex(":");
-                    blob.Metadata["Date"] = r.Replace(Encoding.UTF8.GetString(date).Replace("\0", ""), "-", 2);
-                }
-
-
-                RotateImage(bmp);
-                bmp.Save(ms, ImageFormat.Jpeg);
-
-                ms.Seek(0, SeekOrigin.Begin);
-
-                blob.UploadFromStream(ms);
-                blob.Properties.CacheControl = "max-age=3600, must-revalidate";
-                blob.SetProperties();
-                blob.SetMetadata();
-
-                if (ms != null)
-                {
-                    ms.Close();
-                    ms.Dispose();
-                }
-
-                if (bmp != null)
-                    bmp.Dispose();
-
+                blob.Metadata["lat"] = lat.ToString();
+                blob.Metadata["lng"] = lng.ToString();
             }
+            if (date != null)
+            {
+                Regex r = new Regex(":");
+                blob.Metadata["Date"] = r.Replace(Encoding.UTF8.GetString(date).Replace("\0", ""), "-", 2);
+            }
+
+            RotateImage(bmp);
+            bmp.Save(ms, ImageFormat.Jpeg);
+
+            ms.Seek(0, SeekOrigin.Begin);
+
+            blob.UploadFromStream(ms);
+            blob.Properties.CacheControl = "max-age=3600, must-revalidate";
+            blob.SetProperties();
+            blob.SetMetadata();
+
+            if (ms != null)
+            {
+                ms.Close();
+                ms.Dispose();
+            }
+
+            if (bmp != null)
+                bmp.Dispose();
+
         }
 
         public Image RotateImage(Image bmp)
