@@ -34,6 +34,7 @@ namespace thisistracer.Controllers
             return "success";
         }
 
+        [HttpGet, Authorize] 
         public ActionResult Upload()
         {
             return View();

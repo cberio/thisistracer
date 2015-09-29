@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.WindowsAzure.Storage.Blob;
 using thisistracer.Models;
 using Microsoft.WindowsAzure.Storage;
-using System.Configuration;
 using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
+using thisistracer.Util;
 
 namespace thisistracer.DAL.Home
 {
@@ -26,7 +24,7 @@ namespace thisistracer.DAL.Home
         {
             try
             {
-                storageAccount = CloudStorageAccount.Parse(ConfigurationManager.AppSettings["AzureStroageConnection"]);
+                storageAccount = CloudStorageAccount.Parse(Configure.GetAppConfigure("AzureStroageConnection"));
                 blobClient = storageAccount.CreateCloudBlobClient();
                 container = blobClient.GetContainerReference("photo");
 
@@ -42,7 +40,7 @@ namespace thisistracer.DAL.Home
             }
             catch (Exception ex)
             {
-                throw new Exception("Azure Connection Problem");
+                throw new Exception("Azure Connection Problem :" + ex.InnerException);
             }
         }
 
@@ -163,7 +161,7 @@ namespace thisistracer.DAL.Home
             }
             catch (Exception ex)
             {
-                return null;
+                throw new ArgumentNullException(ex.InnerException.ToString());
             }
 
             return propVal;

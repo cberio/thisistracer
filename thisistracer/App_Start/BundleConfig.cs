@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Optimization;
 
-namespace thisistracer.App_Start
+namespace thisistracer
 {
     class BundleConfig
     {
