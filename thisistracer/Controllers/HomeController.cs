@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using thisistracer.DAL.Home;
+using thisistracer.Models;
 
 
 namespace thisistracer.Controllers
@@ -26,11 +27,12 @@ namespace thisistracer.Controllers
         [HttpPost]
         public string Upload(List<HttpPostedFileBase> fileUpload)
         {
-            foreach (var item in fileUpload)
-            {
-                if (item != null)
-                    iPhotoMap.UploadToBlobStorage(item);
-            }
+            //foreach (var item in fileUpload)
+            //{
+            //    if (item != null)
+            //        iPhotoMap.UploadToBlobStorage(item);
+            //}
+            
             return "success";
         }
 

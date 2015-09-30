@@ -7,6 +7,7 @@ using Microsoft.Owin.Security.Google;
 using Owin;
 using thisistracer.Models;
 using thisistracer.Util;
+using Microsoft.Owin.Security.Facebook;
 
 namespace thisistracer {
     public partial class Startup
@@ -54,10 +55,29 @@ namespace thisistracer {
             //   consumerKey: "",
             //   consumerSecret: "");
             
-            app.UseFacebookAuthentication(
-               appId: Configure.GetAppConfigure("FaceBookAppId"),
-               appSecret: Configure.GetAppConfigure("FaceBookAppSecret")
-            );
+            //app.UseFacebookAuthentication(
+            //   appId: Configure.GetAppConfigure("FaceBookAppId"),
+            //   appSecret: Configure.GetAppConfigure("FaceBookAppSecret")
+            //);
+
+            // use Options
+            var fb = new FacebookAuthenticationOptions();
+            fb.Scope.Add("email");
+            fb.Scope.Add("firends_about_me");
+            //fb.Scope.Add("user_photos");
+            fb.AppId = Configure.GetAppConfigure("FaceBookAppId");
+            fb.AppSecret = Configure.GetAppConfigure("FaceBookAppSecret");
+            fb.Provider = new FacebookAuthenticationProvider() {
+                OnAuthenticated = async context => {
+                    // Get the access token from FB and store it in the database and
+                    // use Facebook C# SDK to get more information about the user
+                    context.Identity.AddClaim(
+                        new System.Security.Claims.Claim("FacebookAccessToekn", context.AccessToken)
+                    );
+                }
+            };
+            fb.SignInAsAuthenticationType = DefaultAuthenticationTypes.ExternalCookie;
+            app.UseFacebookAuthentication(fb);
 
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions() {
                 ClientId = Configure.GetAppConfigure("GoogleClientId"),

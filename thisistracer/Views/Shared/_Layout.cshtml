@@ -4,11 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - you & me</title>
-    @Styles.Render("~/Content/site")
-    @Styles.Render("~/Content/bootstrap")
-    @Scripts.Render("~/js/modernizr")
-    @Scripts.Render("~/js/jquery")
-    @Scripts.Render("~/js/bootstrap")
+    @Styles.Render("~/Content/site",
+                   "~/Content/bootstrap")
+    @Scripts.Render("~/js/modernizr",
+                    "~/js/jquery",
+                    "~/js/bootstrap")
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -23,6 +23,9 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
+                    @if (Request.IsAuthenticated) {
+                        <li>@Html.ActionLink("upload", "Upload", "Home")</li>
+                    }
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
@@ -35,6 +38,6 @@
         <footer>
             <p>&copy; @DateTime.Now.Year - All Rights cb</p>
         </footer>
-    </div>    
+    </div>
 </body>
 </html>

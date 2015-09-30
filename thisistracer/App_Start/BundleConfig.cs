@@ -26,7 +26,11 @@ namespace thisistracer
             bundles.Add(new StyleBundle("~/Content/site").Include(
                 "~/Content/Styles/Site.css"));
 
+#if DEBUG
+            BundleTable.EnableOptimizations = false;
+#else
             BundleTable.EnableOptimizations = true;
+#endif
         }
     }
 }
