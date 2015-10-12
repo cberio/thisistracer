@@ -45,47 +45,11 @@ namespace thisistracer.DAL.Home
                 throw new Exception("Azure Connection Problem :" + ex.InnerException);
             }
         }
-
-        public PhotoMapRepository(System.Security.Principal.IPrincipal User) {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<PhotoMapModel> GetMapInfoList()
-        {
-            List<PhotoMapModel> L_bStroage = new List<PhotoMapModel>();
-            int idx = 0;
-            DateTime dt;
-            float lat = 37.5651f;
-            float lng = 126.98955f;
-
-            foreach (IListBlobItem item in container.ListBlobs(null, true, BlobListingDetails.Metadata))
-            {
-                if (item.GetType() == typeof(CloudBlockBlob))
-                {
-                    CloudBlockBlob blob = (CloudBlockBlob)item;
-                    PhotoMapModel bStorage = new PhotoMapModel();
-
-                    bStorage.idx = idx;
-                    bStorage.ContentType = blob.Properties.ContentType;
-                    bStorage.F_Size = blob.Properties.Length;
-                    bStorage.F_Name = blob.Name;
-                    bStorage.F_OrgName = blob.Metadata["OrgName"];
-                    bStorage.F_Url = blob.Uri;
-                    bStorage.PicDate = DateTime.TryParse(blob.Metadata["Date"], out dt) ? DateTime.Parse(blob.Metadata["Date"]) : dt;
-                    bStorage.F_Latitude = float.TryParse(blob.Metadata["lat"], out lat) ? (float?)float.Parse(blob.Metadata["lat"]) : GetLatitude(bStorage.F_Url);
-                    bStorage.F_Longitude = float.TryParse(blob.Metadata["lng"], out lng) ? (float?)float.Parse(blob.Metadata["lng"]) : GetLongitude(bStorage.F_Url);
-                    idx++;
-                    L_bStroage.Add(bStorage);
-                }
-            }
-
-            return L_bStroage;
-        }
-
+        
         public IEnumerable<PhotoMapModel> GetMapInfoList(System.Security.Principal.IPrincipal User) {
             List<PhotoMapModel> L_bStroage = new List<PhotoMapModel>();
             int idx = 0;
-            DateTime dt;
+            DateTime dt = DateTime.Now;
             float lat = 37.5651f;
             float lng = 126.98955f;
 
@@ -98,18 +62,18 @@ namespace thisistracer.DAL.Home
             foreach (IListBlobItem item in directory.ListBlobs(false, BlobListingDetails.Metadata)) {
                 if (item.GetType() == typeof(CloudBlockBlob)) {
                     CloudBlockBlob blob = (CloudBlockBlob)item;
-                    PhotoMapModel bStorage = new PhotoMapModel();
-
-                    bStorage.idx = idx;
-                    bStorage.ContentType = blob.Properties.ContentType;
-                    bStorage.F_Size = blob.Properties.Length;
-                    bStorage.F_Name = blob.Name;
-                    bStorage.F_OrgName = GetBlobMetadata(blob, "orgName")?.ToString();//blob.Metadata["OrgName"] ?? "";
-                    bStorage.F_Url = blob.Uri;
-                    bStorage.PicDate = DateTime.TryParse(GetBlobMetadata(blob,"Date")?.ToString(), out dt) ? DateTime.Parse(blob.Metadata["Date"]) : dt;
-                    bStorage.F_Latitude = float.TryParse(GetBlobMetadata(blob, "lat")?.ToString(), out lat) ? (float?)float.Parse(blob.Metadata["lat"]) : GetLatitude(bStorage.F_Url);
-                    bStorage.F_Longitude = float.TryParse(GetBlobMetadata(blob, "lng")?.ToString(), out lng) ? (float?)float.Parse(blob.Metadata["lng"]) : GetLongitude(bStorage.F_Url);
-                    idx++;
+                    PhotoMapModel bStorage = new PhotoMapModel() {
+                        idx = idx,
+                        ContentType = blob.Properties.ContentType,
+                        F_Size = blob.Properties.Length,
+                        F_Name = blob.Name,
+                        F_OrgName = GetBlobMetadata(blob, "orgName")?.ToString(), //blob.Metadata["OrgName"] ?? "";
+                        F_Url = blob.Uri,
+                        PicDate = DateTime.TryParse(GetBlobMetadata(blob, "Date")?.ToString(), out dt) ? DateTime.Parse(blob.Metadata["Date"]) : dt,
+                        F_Latitude = float.TryParse(GetBlobMetadata(blob, "lat")?.ToString(), out lat) ? (float?)float.Parse(blob.Metadata["lat"]) : lat,
+                        F_Longitude = float.TryParse(GetBlobMetadata(blob, "lng")?.ToString(), out lng) ? (float?)float.Parse(blob.Metadata["lng"]) : lng
+                    };
+                    idx++;                    
                     L_bStroage.Add(bStorage);
                 }
             }
@@ -169,14 +133,6 @@ namespace thisistracer.DAL.Home
                 //if (targetImg != null)
                 //    targetImg.Dispose();
             }
-        }
-        public float? GetLatitude(Uri uri)
-        {
-            throw new NotImplementedException();
-        }
-        public float? GetLongitude(Uri uri)
-        {
-            throw new NotImplementedException();
         }
 
         public float ExifGpsToFloat(PropertyItem propItemRef, PropertyItem propItem)
@@ -340,10 +296,6 @@ namespace thisistracer.DAL.Home
             if (bmp != null)
                 bmp.Dispose();
 
-        }
-
-        public void UploadToBlobStorage(System.Web.HttpPostedFileBase fs) {
-            throw new NotImplementedException();
         }
 
         public Image RotateImage(Image bmp)
