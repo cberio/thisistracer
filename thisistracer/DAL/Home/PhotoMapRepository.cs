@@ -11,6 +11,7 @@ using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
 using thisistracer.Util;
+using Microsoft.AspNet.Identity;
 
 namespace thisistracer.DAL.Home
 {
@@ -19,6 +20,7 @@ namespace thisistracer.DAL.Home
         private CloudStorageAccount storageAccount;
         private CloudBlobClient blobClient;
         private CloudBlobContainer container;
+        private CloudBlobDirectory directory;
 
         public PhotoMapRepository()
         {
@@ -26,14 +28,14 @@ namespace thisistracer.DAL.Home
             {
                 storageAccount = CloudStorageAccount.Parse(Configure.GetAppConfigure("AzureStroageConnection"));
                 blobClient = storageAccount.CreateCloudBlobClient();
-                container = blobClient.GetContainerReference("photo");
+                container = blobClient.GetContainerReference("thisistracer");
 
                 if (container.CreateIfNotExists())
                 {
                     container.SetPermissions(
                         new BlobContainerPermissions
                         {
-                            PublicAccess = BlobContainerPublicAccessType.Container
+                            PublicAccess = BlobContainerPublicAccessType.Blob
                         }
                     );
                 }
@@ -42,6 +44,10 @@ namespace thisistracer.DAL.Home
             {
                 throw new Exception("Azure Connection Problem :" + ex.InnerException);
             }
+        }
+
+        public PhotoMapRepository(System.Security.Principal.IPrincipal User) {
+            throw new NotImplementedException();
         }
 
         public IEnumerable<PhotoMapModel> GetMapInfoList()
@@ -74,6 +80,49 @@ namespace thisistracer.DAL.Home
             }
 
             return L_bStroage;
+        }
+
+        public IEnumerable<PhotoMapModel> GetMapInfoList(System.Security.Principal.IPrincipal User) {
+            List<PhotoMapModel> L_bStroage = new List<PhotoMapModel>();
+            int idx = 0;
+            DateTime dt;
+            float lat = 37.5651f;
+            float lng = 126.98955f;
+
+            if(User.Identity.GetUserId() != null) {
+                directory = container.GetDirectoryReference(User.Identity.GetUserId());
+            } else {
+                directory = container.GetDirectoryReference("sample");
+            }
+
+            foreach (IListBlobItem item in directory.ListBlobs(false, BlobListingDetails.Metadata)) {
+                if (item.GetType() == typeof(CloudBlockBlob)) {
+                    CloudBlockBlob blob = (CloudBlockBlob)item;
+                    PhotoMapModel bStorage = new PhotoMapModel();
+
+                    bStorage.idx = idx;
+                    bStorage.ContentType = blob.Properties.ContentType;
+                    bStorage.F_Size = blob.Properties.Length;
+                    bStorage.F_Name = blob.Name;
+                    bStorage.F_OrgName = GetBlobMetadata(blob, "orgName")?.ToString();//blob.Metadata["OrgName"] ?? "";
+                    bStorage.F_Url = blob.Uri;
+                    bStorage.PicDate = DateTime.TryParse(GetBlobMetadata(blob,"Date")?.ToString(), out dt) ? DateTime.Parse(blob.Metadata["Date"]) : dt;
+                    bStorage.F_Latitude = float.TryParse(GetBlobMetadata(blob, "lat")?.ToString(), out lat) ? (float?)float.Parse(blob.Metadata["lat"]) : GetLatitude(bStorage.F_Url);
+                    bStorage.F_Longitude = float.TryParse(GetBlobMetadata(blob, "lng")?.ToString(), out lng) ? (float?)float.Parse(blob.Metadata["lng"]) : GetLongitude(bStorage.F_Url);
+                    idx++;
+                    L_bStroage.Add(bStorage);
+                }
+            }
+
+            return L_bStroage;
+        }
+
+        public object GetBlobMetadata(CloudBlockBlob blob, string metadataKey) {
+            if(blob.Metadata.ContainsKey(metadataKey)) {
+                return blob.Metadata[metadataKey];
+            } else {
+                return null;
+            }
         }
 
         public float? GetLatitude(Image targetImg)
@@ -237,7 +286,7 @@ namespace thisistracer.DAL.Home
             return container;
         }
 
-        public void UploadToBlobStorage(System.Web.HttpPostedFileBase fs)
+        public void UploadToBlobStorage(System.Web.HttpPostedFileBase fs, System.Security.Principal.IPrincipal User)
         {
             if (fs == null || fs.ContentLength == 0)
                 return;
@@ -245,7 +294,7 @@ namespace thisistracer.DAL.Home
             if (fs.ContentType != "image/jpeg")
                 return;
 
-            string uniqueName = string.Format("collection01/image_{0}{1}",
+            string uniqueName = string.Format(User.Identity.GetUserId()+ "/image_{0}{1}",
                 DateTime.Now.ToString("yyyyMMddhhmmssms"), Path.GetExtension(fs.FileName));
 
 
@@ -291,6 +340,10 @@ namespace thisistracer.DAL.Home
             if (bmp != null)
                 bmp.Dispose();
 
+        }
+
+        public void UploadToBlobStorage(System.Web.HttpPostedFileBase fs) {
+            throw new NotImplementedException();
         }
 
         public Image RotateImage(Image bmp)

@@ -63,8 +63,8 @@ namespace thisistracer {
             // use Options
             var fb = new FacebookAuthenticationOptions();
             fb.Scope.Add("email");
-            fb.Scope.Add("firends_about_me");
-            fb.Scope.Add("firends_photos");
+            fb.Scope.Add("user_about_me");
+            fb.Scope.Add("user_friends");
             //fb.Scope.Add("user_photos");
             fb.AppId = Configure.GetAppConfigure("FaceBookAppId");
             fb.AppSecret = Configure.GetAppConfigure("FaceBookAppSecret");

@@ -5,7 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using thisistracer.DAL.Home;
 using thisistracer.Models;
-
+using Microsoft.AspNet.Identity;
 
 namespace thisistracer.Controllers
 {
@@ -21,19 +21,22 @@ namespace thisistracer.Controllers
         // GET: Home
         public ActionResult Index()
         {
-            return View(iPhotoMap.GetMapInfoList());
+            //if(User.Identity.GetUserId() != null)
+                return View(iPhotoMap.GetMapInfoList(User));
+            //else 
+            //    return View(iPhotoMap.GetMapInfoList());
         }
 
         [HttpPost]
-        public string Upload(List<HttpPostedFileBase> fileUpload)
+        public ActionResult Upload(List<HttpPostedFileBase> fileUpload)
         {
-            //foreach (var item in fileUpload)
-            //{
-            //    if (item != null)
-            //        iPhotoMap.UploadToBlobStorage(item);
-            //}
-            
-            return "success";
+
+            foreach (var item in fileUpload) {
+                if (item != null)
+                    iPhotoMap.UploadToBlobStorage(item, User);
+            }
+
+            return View("Upload");
         }
 
         [HttpGet, Authorize] 
