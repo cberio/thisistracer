@@ -17,6 +17,6 @@
 
 ## ToDo
 1. Upload Form  
-~~2. Social Login~~  
-~~3. User 별 container 생성 후 Upload~~  
+2. ~~Social Login~~  
+3. ~~User 별 container 생성 후 Upload~~  
 4. 30일 이상 미활동 container/User Data 삭제
