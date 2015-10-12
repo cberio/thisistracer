@@ -264,7 +264,6 @@
       <DependentUpon>201509301202484_ChangedTableName1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\AzureStorageModel.cs" />
     <Compile Include="Util\Configure.cs" />
     <Compile Include="ViewModel\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
