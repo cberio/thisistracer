@@ -20,10 +20,6 @@ namespace thisistracer.Controllers {
             return View(iPhotoMap.GetMapInfoList(User));
         }
 
-        public ActionResult Index(string id) {
-            return View(iPhotoMap.GetMapInfoList(User));
-        }
-
         [HttpPost]
         public ActionResult Upload(List<HttpPostedFileBase> fileUpload) {
 
