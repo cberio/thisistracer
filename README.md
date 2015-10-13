@@ -1,5 +1,5 @@
 # thisistracer
-이거슨 사진을 올리면 사진의 gps 태그를 읽어와 googlemap에 표시하는 예제
+이거슨 업로드한 사진의 gps 태그를 읽어와 googlemap에 표시
 
 ## 사용 lib
 1. Microsoft.WindowsAzure.Storage
@@ -16,7 +16,8 @@
 6. [Azure에 배포 시 민감한 정보 제외하기](http://www.hanselman.com/blog/HowToKeepYourASPNETDatabaseConnectionStringsSecureWhenDeployingToAzureFromSource.aspx)
 
 ## ToDo
-1. Upload Form
-2. Social Login
-3. User 별 container 생성 후 Upload
+1. Upload Form  
+2. ~~Social Login~~ (2015.10.13)
+3. ~~User 별 container 생성 후 Upload~~ (2015.10.13)
 4. 30일 이상 미활동 container/User Data 삭제
+5. 사진 List-up (순서변경, 메타데이터 편집)
