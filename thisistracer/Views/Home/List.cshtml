@@ -1,0 +1,66 @@
+﻿@model IEnumerable<thisistracer.Models.PhotoMapModel>
+
+@{
+    ViewBag.Title = "List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid" style="padding-top:15px">
+    <div class="row" style="">
+        <div class="col-lg-5 col-md-5 col-sm-5 text-center">
+            <span class="glyphicon glyphicon-picture" aria-hidden="true" style="font-size:55px"></span>
+        </div>
+        <div class="col-lg-5 col-md-2 col-sm-5 text-center">
+            <span class="glyphicon glyphicon-map-marker" aria-hidden="true" style="font-size:55px"></span>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-5 text-center">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true" style="font-size:55px"></span>
+        </div>
+    </div>
+
+    @foreach (var item in Model) {
+        <div class="row" style="padding-bottom:5px;">
+            <div class="col-lg-6 col-md-6 text-center">
+                <img src="@Html.DisplayFor(modelItem => item.F_Url)" style="width:100%" />
+            </div>
+            <div class="col-lg-6 col-md-6 text-center map-position" style="height:500px">
+                
+            </div>
+            <div class="col-lg-2 col-md-2">
+
+            </div>
+            <input type="hidden" name="lat" value="@item.F_Latitude" />
+            <input type="hidden" name="lng" value="@item.F_Longitude" />
+        </div>
+    }
+</div>
+<script>
+    var maps, map, marker;
+    var lat, lng;
+
+    function initMap() {
+        maps = $(".map-position");
+
+        maps.each(function (index, element) {
+            lat = $("input[name=lat]")[index];
+            lng = $("input[name=lng]")[index];
+            
+            element = new google.maps.Map((this), {
+                center: {
+                    lat: Number(lat.value),
+                    lng: Number(lng.value)
+                },
+                zoom: 11
+            });
+
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(lat.value, lng.value),
+                map: element
+            });
+        });
+        
+        
+    }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?v=3.20&sensor=false&key=AIzaSyCLISk5-d5kFnu69ywMXdeDS0jsshtgpCU&callback=initMap">
+</script>

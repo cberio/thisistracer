@@ -7,29 +7,25 @@ using thisistracer.DAL.Home;
 using thisistracer.Models;
 using Microsoft.AspNet.Identity;
 
-namespace thisistracer.Controllers
-{
-    public class HomeController : Controller
-    {
+namespace thisistracer.Controllers {
+    public class HomeController : Controller {
         IPhotoMapRepository iPhotoMap;
 
-        public HomeController(IPhotoMapRepository repo)
-        {
+        public HomeController(IPhotoMapRepository repo) {
             iPhotoMap = repo;
         }
 
         // GET: Home
-        public ActionResult Index()
-        {
-            //if(User.Identity.GetUserId() != null)
-                return View(iPhotoMap.GetMapInfoList(User));
-            //else 
-            //    return View(iPhotoMap.GetMapInfoList());
+        public ActionResult Index() {
+            return View(iPhotoMap.GetMapInfoList(User));
+        }
+
+        public ActionResult Index(string id) {
+            return View(iPhotoMap.GetMapInfoList(User));
         }
 
         [HttpPost]
-        public ActionResult Upload(List<HttpPostedFileBase> fileUpload)
-        {
+        public ActionResult Upload(List<HttpPostedFileBase> fileUpload) {
 
             foreach (var item in fileUpload) {
                 if (item != null)
@@ -39,10 +35,14 @@ namespace thisistracer.Controllers
             return View("Upload");
         }
 
-        [HttpGet, Authorize] 
-        public ActionResult Upload()
-        {
+        [HttpGet, Authorize]
+        public ActionResult Upload() {
             return View();
+        }
+
+        [HttpGet]
+        public ActionResult List() {
+            return View(iPhotoMap.GetMapInfoList(User));
         }
     }
 }
