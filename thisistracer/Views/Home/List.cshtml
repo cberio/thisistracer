@@ -6,32 +6,68 @@
 }
 
 <div class="container-fluid" style="padding-top:15px">
+    @*
+        <table class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th class="text-center">
+                        <span class="glyphicon glyphicon-picture" aria-hidden="true" style="font-size:55px"></span>
+                    </th>
+
+                    <th class="text-center">
+                        <span class="glyphicon glyphicon-map-marker" aria-hidden="true" style="font-size:55px"></span>
+                    </th>
+                    <th class="text-center">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true" style="font-size:55px"></span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model) {
+                    <tr>
+                        <th>
+                            <img src="@Html.DisplayFor(modelItem => item.F_Url)" style="width:100%" />
+                        </th>
+                        <td>
+                            <div class="map-position" style="height:500px;">
+                            </div>
+                        </td>
+                        <td></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    *@
+
     <div class="row" style="">
         <div class="col-lg-5 col-md-5 col-sm-5 text-center">
             <span class="glyphicon glyphicon-picture" aria-hidden="true" style="font-size:55px"></span>
         </div>
-        <div class="col-lg-5 col-md-2 col-sm-5 text-center">
+        <div class="col-lg-5 col-md-5 col-sm-5 text-center">
             <span class="glyphicon glyphicon-map-marker" aria-hidden="true" style="font-size:55px"></span>
         </div>
-        <div class="col-lg-2 col-md-2 col-sm-5 text-center">
+        <div class="col-lg-2 col-md-2 col-sm-2 text-center">
             <span class="glyphicon glyphicon-remove" aria-hidden="true" style="font-size:55px"></span>
         </div>
     </div>
 
     @foreach (var item in Model) {
         <div class="row" style="padding-bottom:5px;">
-            <div class="col-lg-6 col-md-6 text-center">
+            <div class="col-lg-5 col-md-5 text-center img-position">
                 <img src="@Html.DisplayFor(modelItem => item.F_Url)" style="width:100%" />
             </div>
-            <div class="col-lg-6 col-md-6 text-center map-position" style="height:500px">
-                
+            <div class="col-lg-5 col-md-5" style="vertical-align:central">
+                <div class="map-position" style="height:500px;">
+
+                </div>
             </div>
             <div class="col-lg-2 col-md-2">
 
             </div>
-            <input type="hidden" name="lat" value="@item.F_Latitude" />
-            <input type="hidden" name="lng" value="@item.F_Longitude" />
         </div>
+
+        <input type="hidden" name="lat" value="@item.F_Latitude" />
+        <input type="hidden" name="lng" value="@item.F_Longitude" />
     }
 </div>
 <script>
@@ -44,7 +80,7 @@
         maps.each(function (index, element) {
             lat = $("input[name=lat]")[index];
             lng = $("input[name=lng]")[index];
-            
+
             element = new google.maps.Map((this), {
                 center: {
                     lat: Number(lat.value),
@@ -57,9 +93,9 @@
                 position: new google.maps.LatLng(lat.value, lng.value),
                 map: element
             });
+
+            $(this).css("height", ($(".img-position").eq(index).css('height')));
         });
-        
-        
     }
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?v=3.20&sensor=false&key=AIzaSyCLISk5-d5kFnu69ywMXdeDS0jsshtgpCU&callback=initMap">

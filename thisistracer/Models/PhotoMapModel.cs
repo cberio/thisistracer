@@ -20,6 +20,8 @@ namespace thisistracer.Models
         [DisplayName("파일크기")]
         public long F_Size { get; set; }
         [DisplayName("날짜")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, NullDisplayText = "yyyy-MM-dd")]
         public DateTime PicDate { get; set; }
         public string ContentType { get; set; }
         [DisplayName("URL")]

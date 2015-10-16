@@ -25,6 +25,7 @@
                 <ul class="nav navbar-nav">
                     @if (Request.IsAuthenticated) {
                         <li>@Html.ActionLink("upload", "Upload", "Home")</li>
+                        <li>@Html.ActionLink("list", "List", "Home")</li>
                     }
                 </ul>
                 @Html.Partial("_LoginPartial")
