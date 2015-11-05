@@ -10,7 +10,7 @@ using thisistracer.Models;
 
 namespace thisistracer.DAL.Home
 {
-    public interface IPhotoMapRepository : IDisposable
+    public interface IBlobStorageRepository : IDisposable
     {
         IEnumerable<PhotoMapModel> GetMapInfoList(System.Security.Principal.IPrincipal User);
         object GetBlobMetadata(CloudBlockBlob blob, string metadataKey);

@@ -15,18 +15,18 @@ using Microsoft.AspNet.Identity;
 
 namespace thisistracer.DAL.Home
 {
-    public class PhotoMapRepository : IPhotoMapRepository, IDisposable
+    public class BlobStorageRepository : IBlobStorageRepository, IDisposable
     {
         private CloudStorageAccount storageAccount;
         private CloudBlobClient blobClient;
         private CloudBlobContainer container;
         private CloudBlobDirectory directory;
 
-        public PhotoMapRepository()
+        public BlobStorageRepository()
         {
             try
             {
-                storageAccount = CloudStorageAccount.Parse(Configure.GetAppConfigure("AzureStroageConnection"));
+                storageAccount = CloudStorageAccount.Parse(Util.Utils.GetAppConfigure("AzureStroageConnection"));
                 blobClient = storageAccount.CreateCloudBlobClient();
                 container = blobClient.GetContainerReference("thisistracer");
 
@@ -60,6 +60,7 @@ namespace thisistracer.DAL.Home
             }
 
             foreach (IListBlobItem item in directory.ListBlobs(false, BlobListingDetails.Metadata)) {
+                
                 if (item.GetType() == typeof(CloudBlockBlob)) {
                     CloudBlockBlob blob = (CloudBlockBlob)item;
                     PhotoMapModel bStorage = new PhotoMapModel() {
@@ -255,8 +256,7 @@ namespace thisistracer.DAL.Home
 
 
             Image bmp = Image.FromStream(fs.InputStream);
-            MemoryStream ms = new MemoryStream();
-            ms.Position = 0;            
+            RotateImage(bmp);
 
             CloudBlockBlob blob = container.GetBlockBlobReference(uniqueName);
             blob.Properties.ContentType = fs.ContentType;            
@@ -277,7 +277,9 @@ namespace thisistracer.DAL.Home
                 blob.Metadata["Date"] = r.Replace(Encoding.UTF8.GetString(date).Replace("\0", ""), "-", 2);
             }
 
-            RotateImage(bmp);
+            MemoryStream ms = new MemoryStream();
+            ms.Position = 0;
+
             bmp.Save(ms, ImageFormat.Jpeg);
 
             ms.Seek(0, SeekOrigin.Begin);

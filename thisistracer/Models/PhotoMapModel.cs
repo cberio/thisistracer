@@ -30,5 +30,7 @@ namespace thisistracer.Models
         public float? F_Latitude { get; set; }
         [DisplayName("Lng")]
         public float? F_Longitude { get; set; }
+        
+        public Album Album { get; set; }
     }
 }

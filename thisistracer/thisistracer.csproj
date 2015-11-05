@@ -246,8 +246,12 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
-    <Compile Include="DAL\Home\IPhotoMapRepository.cs" />
-    <Compile Include="DAL\Home\PhotoMapRepository.cs" />
+    <Compile Include="DAL\Home\BlobStorage.cs" />
+    <Compile Include="DAL\Home\IBlobStorage.cs" />
+    <Compile Include="DAL\Home\IImageProcessRepository.cs" />
+    <Compile Include="DAL\Home\ImageProcessRepository.cs" />
+    <Compile Include="DAL\Home\IBlobStorageRepository.cs" />
+    <Compile Include="DAL\Home\BlobStorageRepository.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -263,7 +267,18 @@
     <Compile Include="Migrations\201509301202484_ChangedTableName1.Designer.cs">
       <DependentUpon>201509301202484_ChangedTableName1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201510261832590_AddAlbumnModel.cs" />
+    <Compile Include="Migrations\201510261832590_AddAlbumnModel.Designer.cs">
+      <DependentUpon>201510261832590_AddAlbumnModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201511031912034_AddAlubms.cs" />
+    <Compile Include="Migrations\201511031912034_AddAlubms.Designer.cs">
+      <DependentUpon>201511031912034_AddAlubms.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\Album.cs" />
+    <Compile Include="Models\BlobMetadata.cs" />
+    <Compile Include="Models\BlobProperty.cs" />
     <Compile Include="Util\Configure.cs" />
     <Compile Include="ViewModel\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -323,6 +338,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201509301202484_ChangedTableName1.resx">
       <DependentUpon>201509301202484_ChangedTableName1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201510261832590_AddAlbumnModel.resx">
+      <DependentUpon>201510261832590_AddAlbumnModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201511031912034_AddAlubms.resx">
+      <DependentUpon>201511031912034_AddAlubms.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

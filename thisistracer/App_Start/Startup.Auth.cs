@@ -66,8 +66,8 @@ namespace thisistracer {
             fb.Scope.Add("user_about_me");
             fb.Scope.Add("user_friends");
             //fb.Scope.Add("user_photos");
-            fb.AppId = Configure.GetAppConfigure("FaceBookAppId");
-            fb.AppSecret = Configure.GetAppConfigure("FaceBookAppSecret");
+            fb.AppId = Util.Utils.GetAppConfigure("FaceBookAppId");
+            fb.AppSecret = Util.Utils.GetAppConfigure("FaceBookAppSecret");
             fb.Provider = new FacebookAuthenticationProvider() {
                 OnAuthenticated = async context => {
                     // Get the access token from FB and store it in the database and
@@ -81,8 +81,8 @@ namespace thisistracer {
             app.UseFacebookAuthentication(fb);
 
             app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions() {
-                ClientId = Configure.GetAppConfigure("GoogleClientId"),
-                ClientSecret = Configure.GetAppConfigure("GoogleClientSecret")
+                ClientId = Util.Utils.GetAppConfigure("GoogleClientId"),
+                ClientSecret = Util.Utils.GetAppConfigure("GoogleClientSecret")
             });
         }
     }
