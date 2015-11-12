@@ -32,7 +32,8 @@ namespace thisistracer.Controllers {
             //IEnumerable<PhotoMapModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
 
             //return View(photoMapList);
-            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == User.Identity.GetUserId());
+            var userId = User.Identity.GetUserId() ?? "sample";
+            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == userId);
 
             return View(map);
         }
@@ -96,7 +97,8 @@ namespace thisistracer.Controllers {
             //IEnumerable<PhotoMapModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
 
             //return View(photoMapList);
-            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == User.Identity.GetUserId());
+            var userId = User.Identity.GetUserId() ?? "sample";
+            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == userId);
 
             return View(map);
         }
