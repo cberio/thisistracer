@@ -10,7 +10,7 @@ namespace thisistracer.DAL.Home {
         Uri UploadBlob(System.IO.MemoryStream ms, string blobName);
         void DeleteBlob(string blobName);
 
-        IEnumerable<PhotoMapModel> IBlobToModel(IEnumerable<IListBlobItem> IListBlob);
+        //IEnumerable<PhotoMapModel> IBlobToModel(IEnumerable<IListBlobItem> IListBlob);
         void SetBlobMetadata(Dictionary<string, string> metadatas);
         void SetBlobProperty(string contentType);
         object GetBlobMetadata(string medatadaKey);

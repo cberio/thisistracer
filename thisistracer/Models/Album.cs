@@ -9,13 +9,12 @@ using thisistracer.Models;
 
 namespace thisistracer.Models {
     public class Album {
-        [Key]
-        public int idx { get; set; }
+        public Guid AlbumId { get; set; } = new Guid();
         public string UserId { get; set; }
         public string AlbumName { get; set; }
         public DateTime AlbumCreateDate { get; set; }
 
         [NotMapped]
-        public virtual ICollection<PhotoMapModel> Photos { get; set; }
+        public virtual ICollection<TracerModel> Photos { get; set; }
     }
 }

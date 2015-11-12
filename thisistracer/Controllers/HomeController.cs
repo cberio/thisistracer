@@ -102,13 +102,5 @@ namespace thisistracer.Controllers {
 
             return View(map);
         }
-
-        [HttpGet, Authorize]
-        public JsonResult GetJsonList() {
-            IEnumerable<IListBlobItem> blobItem = _iBlobMap.GetBlobs(User.Identity.GetUserId());
-            IEnumerable<PhotoMapModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
-
-            return Json(photoMapList, JsonRequestBehavior.AllowGet);
-        }
     }
 }
