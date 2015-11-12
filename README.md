@@ -1,7 +1,7 @@
 # thisistracer
-이거슨 업로드한 사진의 gps 태그를 읽어와 googlemap에 표시
-파일 저장 : Azure BlobStorage
-데이터 저장 : Azure DocumentDB
+이거슨 업로드한 사진의 gps 태그를 읽어와 googlemap에 표시  
+파일 저장 : Azure BlobStorage  
+데이터 저장 : Azure DocumentDB  
 
 ## 사용 lib
 1. Microsoft.WindowsAzure.Storage
