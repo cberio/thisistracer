@@ -4,16 +4,16 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using thisistracer.DAL.Home;
+using thisistracer.DAL;
 using thisistracer.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.WindowsAzure.Storage.Blob;
 using thisistracer.Util;
-using System.Drawing;
 
 namespace thisistracer.Controllers {
     public class HomeController : Controller {
         //IBlobStorageRepository iPhotoMap;
-
+        
         IImageProcessRepository _iImageMap;
         IBlobStorage _iBlobMap;
 
@@ -28,17 +28,27 @@ namespace thisistracer.Controllers {
 
         // GET: Home
         public ActionResult Index() {
-            //return View(iPhotoMap.GetMapInfoList(User));
-            IEnumerable<IListBlobItem> blobItem = _iBlobMap.GetBlobs(User.Identity.GetUserId());
-            IEnumerable<PhotoMapModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
+            //IEnumerable<IListBlobItem> blobItem = _iBlobMap.GetBlobs(User.Identity.GetUserId());
+            //IEnumerable<PhotoMapModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
 
-            return View(photoMapList);
+            //return View(photoMapList);
+            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == User.Identity.GetUserId());
+
+            return View(map);
+        }
+
+        public ActionResult Test() {
+            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == User.Identity.GetUserId());
+
+            return View(map);
         }
 
         [HttpPost, Authorize]
         public ActionResult Upload(List<HttpPostedFileBase> fileUpload) {
             System.IO.MemoryStream ms;
-            Dictionary<string, string> metadata;
+            //Dictionary<string, string> metadata;
+            BlobMetadata metadata;
+            Uri blobUri;
 
             foreach (var item in fileUpload) {
                 //if (item != null)
@@ -56,10 +66,18 @@ namespace thisistracer.Controllers {
                     metadata = _iImageMap.GenerateMetadataFromImg(ms);
 
                     // Upload to blobStorage
-                    _iBlobMap.UploadBlob(ms, uniqueName);
+                    blobUri = _iBlobMap.UploadBlob(ms, uniqueName);
+                    //metadata
 
                     // Set Metadata And Property
-                    _iBlobMap.SetBlobMetadata(metadata);
+                    //_iBlobMap.SetBlobMetadata(metadata);
+                    var tracer = new TracerModel {
+                        userId = User.Identity.GetUserId(),
+                        uri = blobUri,
+                        metadata = metadata
+                    };
+
+                    DocumentDBRepository<TracerModel>.CreateItemAsync(tracer);
                     _iBlobMap.SetBlobProperty(item.ContentType);
                 }
             }
@@ -74,10 +92,13 @@ namespace thisistracer.Controllers {
 
         [HttpGet]
         public ActionResult List() {
-            IEnumerable<IListBlobItem> blobItem = _iBlobMap.GetBlobs(User.Identity.GetUserId());
-            IEnumerable<PhotoMapModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
+            //IEnumerable<IListBlobItem> blobItem = _iBlobMap.GetBlobs(User.Identity.GetUserId());
+            //IEnumerable<PhotoMapModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
 
-            return View(photoMapList);
+            //return View(photoMapList);
+            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == User.Identity.GetUserId());
+
+            return View(map);
         }
 
         [HttpGet, Authorize]

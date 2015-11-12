@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Blob;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using thisistracer.Models;
@@ -6,7 +7,7 @@ using thisistracer.Models;
 namespace thisistracer.DAL.Home {
     public interface IBlobStorage{
         IEnumerable<IListBlobItem> GetBlobs(string userId = "sample");
-        void UploadBlob(System.IO.MemoryStream ms, string blobName);
+        Uri UploadBlob(System.IO.MemoryStream ms, string blobName);
         void DeleteBlob(string blobName);
 
         IEnumerable<PhotoMapModel> IBlobToModel(IEnumerable<IListBlobItem> IListBlob);

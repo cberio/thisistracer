@@ -1,4 +1,4 @@
-﻿@model IEnumerable<thisistracer.Models.PhotoMapModel>
+﻿@model IEnumerable<thisistracer.Models.TracerModel>
 
 @{
     ViewBag.Title = "List";
@@ -54,7 +54,7 @@
     @foreach (var item in Model) {
         <div class="row" style="padding-bottom:5px;">
             <div class="col-lg-5 col-md-5 text-center img-position">
-                <img src="@Html.DisplayFor(modelItem => item.F_Url)" style="width:100%" />
+                <img src="@Html.DisplayFor(modelItem => item.uri)" style="width:100%" />
             </div>
             <div class="col-lg-5 col-md-5" style="vertical-align:central">
                 <div class="map-position" style="height:500px;">
@@ -65,32 +65,30 @@
 
             </div>
         </div>
-
-        <input type="hidden" name="lat" value="@item.F_Latitude" />
-        <input type="hidden" name="lng" value="@item.F_Longitude" />
     }
 </div>
 <script>
     var maps, map, marker;
     var lat, lng;
+    var model = @Html.Raw(Json.Encode(Model));
 
     function initMap() {
         maps = $(".map-position");
 
         maps.each(function (index, element) {
-            lat = $("input[name=lat]")[index];
-            lng = $("input[name=lng]")[index];
-
+            lat = model[index].metadata.latitude;
+            lng = model[index].metadata.longitude;
+            
             element = new google.maps.Map((this), {
                 center: {
-                    lat: Number(lat.value),
-                    lng: Number(lng.value)
+                    lat: Number(lat),
+                    lng: Number(lng)
                 },
                 zoom: 11
             });
 
             marker = new google.maps.Marker({
-                position: new google.maps.LatLng(lat.value, lng.value),
+                position: new google.maps.LatLng(lat, lng),
                 map: element
             });
 

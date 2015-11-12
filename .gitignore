@@ -211,3 +211,4 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 /thisistracer/Web.Debug.config
+/thisistracer/Web.Private.config

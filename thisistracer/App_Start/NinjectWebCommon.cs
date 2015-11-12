@@ -55,7 +55,7 @@ namespace thisistracer.App_Start {
         /// </summary>
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel) {
-            kernel.Bind<IBlobStorageRepository>().To<BlobStorageRepository>();
+            //kernel.Bind<IBlobStorageRepository>().To<BlobStorageRepository>();
 
             kernel.Bind<IBlobStorage>().To<BlobStorage>();
             kernel.Bind<IImageProcessRepository>().To<ImageProcessRepository>();

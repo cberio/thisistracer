@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using thisistracer.Models;
 
 namespace thisistracer.DAL.Home {
     public class ImageProcessRepository : IImageProcessRepository {
@@ -17,24 +18,35 @@ namespace thisistracer.DAL.Home {
             
         }
 
-        public Dictionary<string, string> GenerateMetadataFromImg(MemoryStream imgMs) {
-            Dictionary<string, string> metadata = new Dictionary<string, string>();
-
+        public BlobMetadata GenerateMetadataFromImg(MemoryStream imgMs) {
+            //Dictionary<string, string> metadata = new Dictionary<string, string>();
+            
             img = Image.FromStream(imgMs);
-            var lat = GetLatitude(img);
-            var lng = GetLongitude(img);
+            var lat = GetLatitudeD(img);
+            var lng = GetLongitudeD(img);
             var date = GetPropertyItemValue(img, 36867) ?? null; // pic date
+            DateTime dt = new DateTime();
 
-            if (lat != null && lng != null) {
-                metadata.Add("lat", lat.ToString());
-                metadata.Add("lng", lng.ToString());
-            }
             if (date != null) {
                 Regex r = new Regex(":");
-                metadata.Add("Date", r.Replace(Encoding.UTF8.GetString(date).Replace("\0", ""), "-", 2));
+                dt = DateTime.Parse(r.Replace(Encoding.UTF8.GetString(date).Replace("\0", ""), "-", 2));
             }
 
-            return metadata;
+            //if (lat != null && lng != null) {
+            //    metadata.Add("lat", lat.ToString());
+            //    metadata.Add("lng", lng.ToString());
+            //}
+            //if (date != null) {
+            //    Regex r = new Regex(":");
+            //    metadata.Add("Date", r.Replace(Encoding.UTF8.GetString(date).Replace("\0", ""), "-", 2));
+            //}            
+
+            return new BlobMetadata {
+                latitude = lat,
+                longitude = lng,
+                location = new Microsoft.Azure.Documents.Spatial.Point(lat, lng),
+                picDate = dt
+            };
         }
 
         public float? GetLatitude(Image targetImg) {
@@ -90,6 +102,62 @@ namespace thisistracer.DAL.Home {
                 coorditate = 0 - coorditate;
             return coorditate;
         }
+
+        public double GetLatitudeD(Image targetImg) {
+            try {
+                //Property Item 0x0001 - PropertyTagGpsLatitudeRef
+                PropertyItem propItemRef = targetImg.GetPropertyItem(1);
+                //Property Item 0x0002 - PropertyTagGpsLatitude
+                PropertyItem propItemLat = targetImg.GetPropertyItem(2);
+
+                //https://cberio.blob.core.windows.net/photo/collection01/20150723_101520.jpg
+                //https://cberio.blob.core.windows.net/photo/collection01/20150722_234712.jpg
+
+                //System.Diagnostics.Debug.WriteLine("==== Orient = " + targetImg.GetPropertyItem(274).Value[0]);
+                return ExifGpsToFloat(propItemRef, propItemLat);
+            } catch (ArgumentException) {
+                throw new ArgumentException("GetLatitudeD Exception");
+                //return null;
+            } finally {
+                //if (targetImg != null)
+                //    targetImg.Dispose();
+            }
+        }
+        public double GetLongitudeD(Image targetImg) {
+            try {
+                ///Property Item 0x0003 - PropertyTagGpsLongitudeRef
+                PropertyItem propItemRef = targetImg.GetPropertyItem(0x0003);
+                //Property Item 0x0004 - PropertyTagGpsLongitude
+                PropertyItem propItemLong = targetImg.GetPropertyItem(0x0004);
+                return ExifGpsToFloat(propItemRef, propItemLong);
+            } catch (ArgumentException) {
+                throw new ArgumentException("GetLongitudeD Exception");
+            } finally {
+                //if (targetImg != null)
+                //    targetImg.Dispose();
+            }
+        }
+
+        public double ExifGpsToFloatD(PropertyItem propItemRef, PropertyItem propItem) {
+            uint degreesNumerator = BitConverter.ToUInt32(propItem.Value, 0);
+            uint degreesDenominator = BitConverter.ToUInt32(propItem.Value, 4);
+            double degrees = degreesNumerator / (double)degreesDenominator;
+
+            uint minutesNumerator = BitConverter.ToUInt32(propItem.Value, 8);
+            uint minutesDenominator = BitConverter.ToUInt32(propItem.Value, 12);
+            double minutes = minutesNumerator / (double)minutesDenominator;
+
+            uint secondsNumerator = BitConverter.ToUInt32(propItem.Value, 16);
+            uint secondsDenominator = BitConverter.ToUInt32(propItem.Value, 20);
+            double seconds = secondsNumerator / (double)secondsDenominator;
+
+            double coorditate = degrees + (minutes / 60f) + (seconds / 3600f);
+            string gpsRef = System.Text.Encoding.ASCII.GetString(new byte[1] { propItemRef.Value[0] }); //N, S, E, or W
+            if (gpsRef == "S" || gpsRef == "W")
+                coorditate = 0 - coorditate;
+            return coorditate;
+        }
+
         public byte[] GetPropertyItemValue(Image img, int propId) {
             byte[] propVal = null;
 

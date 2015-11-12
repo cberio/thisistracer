@@ -44,6 +44,6 @@ namespace thisistracer.Models {
             modelBuilder.Entity<IdentityRole>().ToTable("TRC_Role").Property(p => p.Id).HasColumnName("RoleId");
         }
 
-        public DbSet<Album> Albums { get; set; }
+        //public DbSet<Album> Albums { get; set; }
     }
 }

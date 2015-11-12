@@ -1,4 +1,4 @@
-﻿@model IEnumerable<thisistracer.Models.PhotoMapModel>
+﻿@model IEnumerable<thisistracer.Models.TracerModel>
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -8,9 +8,10 @@
     <div id="carousel-example-generic" class="carousel slide col-md-6 hidden" data-ride="carousel" style="margin-top:15px;margin-bottom:15px">
         <!-- Indicators -->
         <ol class="carousel-indicators hidden">
+            
             @foreach (var item in Model)
             {
-                <li data-target="#carousel-example-generic" data-slide-to="@item.idx" class=""></li>
+                <li data-target="#carousel-example-generic" data-slide-to="" class=""></li>
             }
         </ol>
 
@@ -39,17 +40,6 @@
     </div>
 
     <div id="map" class="col-md-12">
-    </div>
-
-    <div class="hidden">
-        @foreach (var item in Model)
-        {
-            @Html.Hidden("idx", item.idx)        <br />
-            @Html.Hidden("lat", item.F_Latitude) <br />
-            @Html.Hidden("lng", item.F_Longitude)<br />
-            @Html.Hidden("date", item.PicDate)   <br />
-            @Html.Hidden("url", item.F_Url)      <br />
-        }
     </div>
 
     @*
@@ -123,11 +113,15 @@
     var deviceWidth, ratio;
     var map, geoList, infoWindow, infoContent, marker;
     var markerList = [];
-    var markerObj = { lat: [], lng: [], idx: [], date: [], url: [] };
-    
+    //var markerObj = { lat: [], lng: [], idx: [], date: [], url: [] };
+    var model = @Html.Raw(Json.Encode(Model));
+
     $(document).ready(function () {
         $(".item:first").addClass("active");
         $(".carousel-indicators li:first").addClass("active");
+        $(".carousel-indicators").children().each(function(idx, element) {
+            $(element).attr("data-slide-to", ++idx);
+        });
         $("#map").css("height", window.innerHeight);
         deviceWidth = screen.width;
         ratio = window.DeviceRotationRate || 1;
@@ -138,15 +132,10 @@
         activeMarker();
     });
 
-    $(window).load(function () {
-        //activeMarker();
-        //$(".carousel").carousel('cycle');
-    });
-
     function activeMarker() {
         var activeIdx = $(".carousel-inner .active").index();
 
-        map.panTo({ lat: markerObj.lat[activeIdx], lng: markerObj.lng[activeIdx] });
+        map.panTo({ lat: model[activeIdx].metadata.latitude, lng: model[activeIdx].metadata.longitude });
         google.maps.event.trigger(markerList[activeIdx], "click");
     }
 
@@ -155,42 +144,44 @@
         infoWindow = new google.maps.InfoWindow();
 
         map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: Number($("input[name='lat']").val()), lng: Number($("input[name='lng']").val()) },
+            center: { lat: Number(model[0].metadata.latitude), lng: Number(model[0].metadata.longitude) },
             zoom: 11
         });
 
-        $("input[type='hidden']").each(function (idx, ele) {
-            switch ($(ele).attr("name")) {
-                case "idx":
-                    markerObj.idx.push(idx);
-                    break;
-                case "lat":
-                    markerObj.lat.push(Number($(this).val()));
-                    break;
-                case "lng":
-                    markerObj.lng.push(Number($(this).val()));
-                    break;
-                case "date":
-                    markerObj.date.push($(this).val());
-                    break;
-                case "url":
-                    markerObj.url.push($(this).val());
-                    break;
-            }
-        });
+        //$("input[type='hidden']").each(function (idx, ele) {
+        //    switch ($(ele).attr("name")) {
+        //        case "idx":
+        //            markerObj.idx.push(idx);
+        //            break;
+        //        case "lat":
+        //            markerObj.lat.push(Number($(this).val()));
+        //            break;
+        //        case "lng":
+        //            markerObj.lng.push(Number($(this).val()));
+        //            break;
+        //        case "date":
+        //            markerObj.date.push($(this).val());
+        //            break;
+        //        case "url":
+        //            markerObj.url.push($(this).val());
+        //            break;
+        //    }
+        //});
 
-        for (var i = 0; i < markerObj.idx.length; i++) {
+        for (var i = 0; i < model.length; i++) {
             marker = new google.maps.Marker({
-                position: new google.maps.LatLng(markerObj.lat[i], markerObj.lng[i]),
+                position: new google.maps.LatLng(model[i].metadata.latitude, model[0].metadata.longitude),
                 map: map
             });
 
             google.maps.event.addListener(marker, 'click', (function (marker, i) {
                 return function () {
+                    var picDate = model[i].metadata.picDate;
+                    picDate = new Date(parseInt(picDate.substr(6)));
 
                     map.setZoom(11);
                     map.panTo(marker.getPosition());
-                    infoWindow.setContent(intowindowContent(markerObj.date[i], markerObj.url[i], '100%', '100%'));
+                    infoWindow.setContent(intowindowContent(picDate, model[i].uri, '100%', '100%'));
                     //infoWindow.setContent($("#infoContent").html());
                     infoWindow.open(map, marker);
 

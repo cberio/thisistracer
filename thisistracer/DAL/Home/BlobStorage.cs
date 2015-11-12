@@ -34,7 +34,7 @@ namespace thisistracer.DAL.Home {
             }
         }
 
-        public virtual void UploadBlob(MemoryStream ms, string blobName) {
+        public virtual Uri UploadBlob(MemoryStream ms, string blobName) {
             if (ms == null)
                 throw new ArgumentNullException("MemoryStream is null");
 
@@ -50,6 +50,8 @@ namespace thisistracer.DAL.Home {
                 ms.Close();
                 ms.Dispose();
             }
+
+            return blob.Uri;
         }
 
         public void DeleteBlob(string blobName) {
