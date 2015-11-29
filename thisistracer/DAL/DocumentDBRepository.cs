@@ -9,9 +9,9 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace thisistracer.DAL {
-    public static class DocumentDBRepository<T> {
+    public class DocumentDBRepository<T> : IDocumentDBRepository<T> {
         //Use the Database if it exists, if not create a new Database
-        private static Database ReadOrCreateDatabase() {
+        public Database ReadOrCreateDatabase() {
             var db = Client.CreateDatabaseQuery()
                             .Where(d => d.Id == DatabaseId)
                             .AsEnumerable()
@@ -25,7 +25,7 @@ namespace thisistracer.DAL {
         }
 
         //Use the DocumentCollection if it exists, if not create a new Collection
-        private static DocumentCollection ReadOrCreateCollection(string databaseLink) {
+        public DocumentCollection ReadOrCreateCollection(string databaseLink) {
             var col = Client.CreateDocumentCollectionQuery(databaseLink)
                               .Where(c => c.Id == CollectionId)
                               .AsEnumerable()
@@ -42,8 +42,8 @@ namespace thisistracer.DAL {
         }
 
         //Expose the "database" value from configuration as a property for internal use
-        private static string databaseId;
-        private static String DatabaseId {
+        private string databaseId;
+        private String DatabaseId {
             get {
                 if (string.IsNullOrEmpty(databaseId)) {
                     databaseId = ConfigurationManager.AppSettings["database"];
@@ -54,8 +54,8 @@ namespace thisistracer.DAL {
         }
 
         //Expose the "collection" value from configuration as a property for internal use
-        private static string collectionId;
-        private static String CollectionId {
+        private string collectionId;
+        private String CollectionId {
             get {
                 if (string.IsNullOrEmpty(collectionId)) {
                     collectionId = ConfigurationManager.AppSettings["collection"];
@@ -66,8 +66,8 @@ namespace thisistracer.DAL {
         }
 
         //Use the ReadOrCreateDatabase function to get a reference to the database.
-        private static Database database;
-        private static Database Database {
+        private Database database;
+        private Database Database {
             get {
                 if (database == null) {
                     database = ReadOrCreateDatabase();
@@ -78,8 +78,8 @@ namespace thisistracer.DAL {
         }
 
         //Use the ReadOrCreateCollection function to get a reference to the collection.
-        private static DocumentCollection collection;
-        private static DocumentCollection Collection {
+        private DocumentCollection collection;
+        private DocumentCollection Collection {
             get {
                 if (collection == null) {
                     collection = ReadOrCreateCollection(Database.SelfLink);
@@ -92,8 +92,8 @@ namespace thisistracer.DAL {
         //This property establishes a new connection to DocumentDB the first time it is used, 
         //and then reuses this instance for the duration of the application avoiding the
         //overhead of instantiating a new instance of DocumentClient with each request
-        private static DocumentClient client;
-        private static DocumentClient Client {
+        private DocumentClient client;
+        private DocumentClient Client {
             get {
                 if (client == null) {
                     string endpoint = ConfigurationManager.AppSettings["endpoint"];
@@ -106,13 +106,13 @@ namespace thisistracer.DAL {
             }
         }
 
-        public static IEnumerable<T> GetItems(Expression<Func<T, bool>> predicate) {
+        public IEnumerable<T> GetItems(Expression<Func<T, bool>> predicate) {
             return Client.CreateDocumentQuery<T>(Collection.DocumentsLink)
                 .Where(predicate)
                 .AsEnumerable();
         }
 
-        public static IEnumerable<T> GetItems(Expression<Func<T, bool>> predicate, 
+        public IEnumerable<T> GetItems(Expression<Func<T, bool>> predicate, 
             Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null) {
 
             IQueryable<T> query = Client.CreateDocumentQuery<T>(Collection.DocumentsLink);
@@ -128,23 +128,23 @@ namespace thisistracer.DAL {
             }
         }
 
-        public static async Task<Document> CreateItemAsync(T item) {
+        public async Task<Document> CreateItemAsync(T item) {
             return await Client.CreateDocumentAsync(Collection.SelfLink, item);
         }
 
-        public static T GetItem(Expression<Func<T, bool>> predicate) {
+        public T GetItem(Expression<Func<T, bool>> predicate) {
             return Client.CreateDocumentQuery<T>(Collection.DocumentsLink)
                         .Where(predicate)
                         .AsEnumerable()
                         .FirstOrDefault();
         }
 
-        public static async Task<Document> UpdateItemAsync(string id, T item) {
+        public async Task<Document> UpdateItemAsync(string id, T item) {
             Document doc = GetDocument(id);
             return await Client.ReplaceDocumentAsync(doc.SelfLink, item);
         }
 
-        private static Document GetDocument(string id) {
+        public Document GetDocument(string id) {
             return Client.CreateDocumentQuery(Collection.DocumentsLink)
                 .Where(d => d.Id == id)
                 .AsEnumerable()

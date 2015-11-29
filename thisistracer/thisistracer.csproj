@@ -255,6 +255,7 @@
     <Compile Include="DAL\Home\IBlobStorage.cs" />
     <Compile Include="DAL\Home\IImageProcessRepository.cs" />
     <Compile Include="DAL\Home\ImageProcessRepository.cs" />
+    <Compile Include="DAL\IDocumentDBRepository.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -292,7 +293,6 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="ViewModel\HomeViewModel.cs" />
     <Compile Include="ViewModel\ManageViewModels.cs" />
-    <Compile Include="Models\PhotoMapModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>

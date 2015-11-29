@@ -16,14 +16,12 @@ namespace thisistracer.Controllers {
         
         IImageProcessRepository _iImageMap;
         IBlobStorage _iBlobMap;
+        IDocumentDBRepository<TracerModel> _doc;
 
-        //public HomeController(IBlobStorageRepository repo) {
-        //    iPhotoMap = repo;
-        //}
-
-        public HomeController(IImageProcessRepository imgRepo, IBlobStorage iBlobStorage) {
+        public HomeController(IImageProcessRepository imgRepo, IBlobStorage iBlobStorage, IDocumentDBRepository<TracerModel> docDB) {
             _iImageMap = imgRepo;
             _iBlobMap = iBlobStorage;
+            _doc = docDB;
         }
 
         // GET: Home
@@ -33,13 +31,13 @@ namespace thisistracer.Controllers {
 
             //return View(photoMapList);
             var userId = User.Identity.GetUserId() ?? "sample";
-            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == userId);
+            var map = _doc.GetItems(d => d.userId == userId);
 
             return View(map);
         }
 
         public ActionResult Test() {
-            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == User.Identity.GetUserId());
+            var map = _doc.GetItems(d => d.userId == User.Identity.GetUserId());
 
             return View(map);
         }
@@ -78,7 +76,7 @@ namespace thisistracer.Controllers {
                         metadata = metadata
                     };
 
-                    DocumentDBRepository<TracerModel>.CreateItemAsync(tracer);
+                    _doc.CreateItemAsync(tracer);
                     _iBlobMap.SetBlobProperty(item.ContentType);
                 }
             }
@@ -93,12 +91,8 @@ namespace thisistracer.Controllers {
 
         [HttpGet]
         public ActionResult List() {
-            //IEnumerable<IListBlobItem> blobItem = _iBlobMap.GetBlobs(User.Identity.GetUserId());
-            //IEnumerable<PhotoMapModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
-
-            //return View(photoMapList);
             var userId = User.Identity.GetUserId() ?? "sample";
-            var map = DocumentDBRepository<TracerModel>.GetItems(d => d.userId == userId);
+            var map = _doc.GetItems(d => d.userId == userId);
 
             return View(map);
         }

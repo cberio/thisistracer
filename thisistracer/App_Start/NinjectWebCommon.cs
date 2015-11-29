@@ -9,7 +9,9 @@ namespace thisistracer.App_Start {
 
     using Ninject;
     using Ninject.Web.Common;
+    using DAL;
     using DAL.Home;
+    using Models;
 
     public static class NinjectWebCommon {
         private static readonly Bootstrapper bootstrapper = new Bootstrapper();
@@ -59,6 +61,7 @@ namespace thisistracer.App_Start {
 
             kernel.Bind<IBlobStorage>().To<BlobStorage>();
             kernel.Bind<IImageProcessRepository>().To<ImageProcessRepository>();
+            kernel.Bind(typeof(IDocumentDBRepository<>)).To(typeof(DocumentDBRepository<>)).InSingletonScope();
         }
     }
 }
