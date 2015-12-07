@@ -12,28 +12,33 @@ using thisistracer.Util;
 
 namespace thisistracer.Controllers {
     public class HomeController : Controller {
-        //IBlobStorageRepository iPhotoMap;
         
         IImageProcessRepository _iImageMap;
         IBlobStorage _iBlobMap;
         IDocumentDBRepository<TracerModel> _doc;
+        ITableStorage<TracerModel> _tab;
 
-        public HomeController(IImageProcessRepository imgRepo, IBlobStorage iBlobStorage, IDocumentDBRepository<TracerModel> docDB) {
+        public HomeController(IImageProcessRepository imgRepo, IBlobStorage iBlobStorage, IDocumentDBRepository<TracerModel> docDB, ITableStorage<TracerModel> tab) {
             _iImageMap = imgRepo;
             _iBlobMap = iBlobStorage;
             _doc = docDB;
+            _tab = tab;
         }
 
         // GET: Home
         public ActionResult Index() {
             //IEnumerable<IListBlobItem> blobItem = _iBlobMap.GetBlobs(User.Identity.GetUserId());
-            //IEnumerable<PhotoMapModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
-
-            //return View(photoMapList);
+            //IEnumerable<TracerModel> photoMapList = _iBlobMap.IBlobToModel(blobItem);
             var userId = User.Identity.GetUserId() ?? "sample";
-            var map = _doc.GetItems(d => d.userId == userId);
+            IEnumerable<TracerModel> photoMapList = _tab.GetItems<TracerModel>(d => d.PartitionKey == userId);
 
-            return View(map);
+            return View(photoMapList);
+
+            /* documentDB */
+            //var userId = User.Identity.GetUserId() ?? "sample";
+            //var map = _doc.GetItems(d => d.userId == userId);
+
+            //return View(map);
         }
 
         public ActionResult Test() {
@@ -70,13 +75,16 @@ namespace thisistracer.Controllers {
 
                     // Set Metadata And Property
                     //_iBlobMap.SetBlobMetadata(metadata);
-                    var tracer = new TracerModel {
-                        userId = User.Identity.GetUserId(),
-                        uri = blobUri,
-                        metadata = metadata
-                    };
+                    var tracer = new TracerModel(User.Identity.GetUserId(), Guid.NewGuid().ToString());
+                    tracer.userId = User.Identity.GetUserId();
+                    tracer.uri = blobUri.ToString();
+                    tracer.latitude = metadata.latitude;
+                    tracer.longitude = metadata.longitude;
+                    tracer.picDate = metadata.picDate;
+                    
 
-                    _doc.CreateItemAsync(tracer);
+                    //_doc.CreateItemAsync(tracer);
+                    _tab.Insert(tracer);
                     _iBlobMap.SetBlobProperty(item.ContentType);
                 }
             }
@@ -91,10 +99,14 @@ namespace thisistracer.Controllers {
 
         [HttpGet]
         public ActionResult List() {
-            var userId = User.Identity.GetUserId() ?? "sample";
-            var map = _doc.GetItems(d => d.userId == userId);
+            //var userId = User.Identity.GetUserId() ?? "sample";
+            //var map = _doc.GetItems(d => d.userId == userId);
 
-            return View(map);
+            //return View(map);
+            var userId = User.Identity.GetUserId() ?? "sample";
+            IEnumerable<TracerModel> photoMapList = _tab.GetItems<TracerModel>(d => d.PartitionKey == userId);
+
+            return View(photoMapList);
         }
     }
 }

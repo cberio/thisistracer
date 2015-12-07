@@ -76,8 +76,8 @@
         maps = $(".map-position");
 
         maps.each(function (index, element) {
-            lat = model[index].metadata.latitude;
-            lng = model[index].metadata.longitude;
+            lat = model[index].latitude;
+            lng = model[index].longitude;
             
             element = new google.maps.Map((this), {
                 center: {

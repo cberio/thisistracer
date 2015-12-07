@@ -135,7 +135,7 @@
     function activeMarker() {
         var activeIdx = $(".carousel-inner .active").index();
 
-        map.panTo({ lat: model[activeIdx].metadata.latitude, lng: model[activeIdx].metadata.longitude });
+        map.panTo({ lat: model[activeIdx].latitude, lng: model[activeIdx].longitude });
         google.maps.event.trigger(markerList[activeIdx], "click");
     }
 
@@ -144,7 +144,7 @@
         infoWindow = new google.maps.InfoWindow();
 
         map = new google.maps.Map(document.getElementById('map'), {
-            center: { lat: Number(model[0].metadata.latitude), lng: Number(model[0].metadata.longitude) },
+            center: { lat: Number(model[0].latitude), lng: Number(model[0].longitude) },
             zoom: 11
         });
 
@@ -170,13 +170,13 @@
 
         for (var i = 0; i < model.length; i++) {
             marker = new google.maps.Marker({
-                position: new google.maps.LatLng(model[i].metadata.latitude, model[0].metadata.longitude),
+                position: new google.maps.LatLng(model[i].latitude, model[0].longitude),
                 map: map
             });
 
             google.maps.event.addListener(marker, 'click', (function (marker, i) {
                 return function () {
-                    var picDate = model[i].metadata.picDate;
+                    var picDate = model[i].picDate;
                     picDate = new Date(parseInt(picDate.substr(6)));
 
                     map.setZoom(11);

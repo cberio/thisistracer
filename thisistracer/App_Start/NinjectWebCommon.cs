@@ -62,6 +62,7 @@ namespace thisistracer.App_Start {
             kernel.Bind<IBlobStorage>().To<BlobStorage>();
             kernel.Bind<IImageProcessRepository>().To<ImageProcessRepository>();
             kernel.Bind(typeof(IDocumentDBRepository<>)).To(typeof(DocumentDBRepository<>)).InSingletonScope();
+            kernel.Bind(typeof(ITableStorage<>)).To(typeof(TableStorage<>)).InSingletonScope();
         }
     }
 }

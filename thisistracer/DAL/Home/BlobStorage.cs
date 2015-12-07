@@ -30,7 +30,7 @@ namespace thisistracer.DAL.Home {
                     );
                 }
             } catch (Exception ex) {
-                throw new Exception("Azure Connection Problem :" + ex.InnerException);
+                throw new Exception("Azure Blob Storage Connection Problem :" + ex.InnerException);
             }
         }
 

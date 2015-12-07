@@ -255,7 +255,10 @@
     <Compile Include="DAL\Home\IBlobStorage.cs" />
     <Compile Include="DAL\Home\IImageProcessRepository.cs" />
     <Compile Include="DAL\Home\ImageProcessRepository.cs" />
+    <Compile Include="DAL\Home\ITableStorage.cs" />
+    <Compile Include="DAL\Home\TableStorage.cs" />
     <Compile Include="DAL\IDocumentDBRepository.cs" />
+    <Compile Include="DAL\StorageConfigure.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

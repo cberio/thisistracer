@@ -52,9 +52,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\thisistracer\thisistracer.csproj">
+    <ProjectReference Include="..\thisistracer\thisistracer.WEB.csproj">
       <Project>{A89C04AD-9965-42D5-93A5-F7CBAA140323}</Project>
-      <Name>thisistracer</Name>
+      <Name>thisistracer.WEB</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
