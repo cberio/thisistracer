@@ -9,7 +9,7 @@ using thisistracer.Models;
 
 namespace thisistracer.Models {
     public class Album {
-        public Guid AlbumId { get; set; } = new Guid();
+        public Guid AlbumId { get; set; } = Guid.NewGuid();
         public string UserId { get; set; }
         public string AlbumName { get; set; }
         public DateTime AlbumCreateDate { get; set; }

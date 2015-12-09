@@ -136,6 +136,7 @@
         var activeIdx = $(".carousel-inner .active").index();
 
         map.panTo({ lat: model[activeIdx].latitude, lng: model[activeIdx].longitude });
+        console.log(model[activeIdx].latitude, model[activeIdx].longitude);
         google.maps.event.trigger(markerList[activeIdx], "click");
     }
 
@@ -170,7 +171,7 @@
 
         for (var i = 0; i < model.length; i++) {
             marker = new google.maps.Marker({
-                position: new google.maps.LatLng(model[i].latitude, model[0].longitude),
+                position: new google.maps.LatLng(model[i].latitude, model[i].longitude),
                 map: map
             });
 

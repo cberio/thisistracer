@@ -57,7 +57,7 @@ namespace thisistracer.Controllers {
             foreach (var item in fileUpload) {
                 //if (item != null)
                 //iPhotoMap.UploadToBlobStorage(item, User);
-                
+
                 if (item != null && item?.ContentLength > 0 && item?.ContentType == "image/jpeg") {
                     ms = new System.IO.MemoryStream();
 
@@ -75,13 +75,13 @@ namespace thisistracer.Controllers {
 
                     // Set Metadata And Property
                     //_iBlobMap.SetBlobMetadata(metadata);
-                    var tracer = new TracerModel(User.Identity.GetUserId(), Guid.NewGuid().ToString());
-                    tracer.userId = User.Identity.GetUserId();
-                    tracer.uri = blobUri.ToString();
-                    tracer.latitude = metadata.latitude;
-                    tracer.longitude = metadata.longitude;
-                    tracer.picDate = metadata.picDate;
-                    
+                    var tracer = new TracerModel(User.Identity.GetUserId(), Guid.NewGuid().ToString()) {
+                        userId = User.Identity.GetUserId(),
+                        uri = blobUri.ToString(),
+                        latitude = metadata.latitude,
+                        longitude = metadata.longitude,
+                        picDate = metadata.picDate
+                    };
 
                     //_doc.CreateItemAsync(tracer);
                     _tab.Insert(tracer);

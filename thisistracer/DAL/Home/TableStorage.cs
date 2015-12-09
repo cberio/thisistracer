@@ -61,6 +61,12 @@ namespace thisistracer.DAL.Home {
             throw new NotImplementedException("");
         }
 
+        public IEnumerable<T> GetItems(Expression<Func<T, bool>> predicate) {
+            var tableQuery = new TableQuery<T>().Where(predicate);
+            
+            return tableQuery;
+        }
+
         public T GetItem(string partitionKey, string rowKey) {
             tableOperation = TableOperation.Retrieve<T>(partitionKey, rowKey);
             tableResult = table.Execute(tableOperation);
